@@ -1,0 +1,900 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>تطبيق بنكي متكامل</title>
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@200;300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    <link rel="stylesheet" href="style.css">
+    <script src="https://unpkg.com/html5-qrcode"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <!-- EmailJS SDK -->
+    <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
+</head>
+<body>
+<div id="mobile-wrapper">
+
+    <!-- ===================== شاشة تسجيل الدخول ===================== -->
+    <div id="screen-login" class="app-screen" style="display: block;">
+        <div class="viewport login-viewport">
+            <div class="design">
+                <div class="top-bar">
+                    <div class="top-title">تسجيل الدخول</div>
+                    <div class="menu" id="login-menu-trigger" aria-label="فتح القائمة"><i class="fas fa-bars"></i></div>
+                </div>
+
+                <div class="lang-container">
+                    <div class="lang">En</div>
+                </div>
+
+                <div class="form-container">
+                    <div class="group">
+                        <input type="text" class="login-input" placeholder="اسم المستخدم">
+                    </div>
+                    <div class="group">
+                        <input type="password" class="login-input" placeholder="كلمة المرور">
+                    </div>
+                    <button class="btn primary login-btn">تسجيل الدخول</button>
+                    <button class="btn secondary login-btn" id="otp-login-btn">استخدم رمز التأكيد لتسجيل الدخول</button>
+
+                    <div class="cards-grid">
+                        <div class="card-item" id="contact-us-trigger">
+                            <img src="https://i.imgur.com/MTkgnxA.png" alt="تواصل معنا">
+                        </div>
+                        <div class="card-item" id="about-us-trigger">
+                            <img src="https://i.imgur.com/ZwMvqQE.png" alt="عن محفظتي" class="contact-banner-img">
+                            <div class="contact-icon-wrap" id="about-us-icon-trigger">
+                                <img src="https://i.imgur.com/Onb117a.png" alt="عن بال باي">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="login-modal" id="confirmModal">
+            <div class="login-modal-content">
+                <h2 class="modal-title">تسجيل الدخول</h2>
+                <p class="modal-sub">تأكيد رمز الدخول للاستمرار</p>
+                <div class="code-inputs">
+                    <input type="text" maxlength="1" inputmode="numeric" pattern="[0-9]*">
+                    <input type="text" maxlength="1" inputmode="numeric" pattern="[0-9]*">
+                    <input type="text" maxlength="1" inputmode="numeric" pattern="[0-9]*">
+                    <input type="text" maxlength="1" inputmode="numeric" pattern="[0-9]*">
+                </div>
+                <div class="modal-footer">
+                    <div class="cancel-btn">إلغاء</div>
+                </div>
+            </div>
+        </div>
+
+
+        <!-- ===================== قائمة شاشة تسجيل الدخول ===================== -->
+        <div id="login-menu-overlay" class="login-menu-overlay" aria-hidden="true"></div>
+        <aside id="login-menu-panel" class="login-menu-panel" aria-label="قائمة تسجيل الدخول">
+            <div class="login-menu-header">
+                <span>القائمة</span>
+                <button type="button" id="close-login-menu" aria-label="إغلاق القائمة">إغلاق</button>
+            </div>
+
+            <div class="login-menu-items">
+                <button class="login-menu-item" type="button" data-login-menu-screen="about-app">
+                    <img class="login-menu-icon" src="https://i.imgur.com/pe0jiRL.png" alt="عن التطبيق">
+                    <span>عن التطبيق</span>
+                </button>
+
+                <button class="login-menu-item" type="button" data-login-menu-screen="login">
+                    <img class="login-menu-icon" src="https://i.imgur.com/75Iyigd.png" alt="تسجيل الدخول">
+                    <span>تسجيل الدخول</span>
+                </button>
+
+                <button class="login-menu-item" type="button" data-login-menu-screen="about-wallet">
+                    <img class="login-menu-icon" src="https://i.imgur.com/OUeA8FJ.png" alt="عن محفظتي">
+                    <span>عن محفظتي</span>
+                </button>
+
+                <button class="login-menu-item" type="button" data-login-menu-screen="contact">
+                    <img class="login-menu-icon" src="https://i.imgur.com/Ss6SAj2.png" alt="اتصل بنا">
+                    <span>اتصل بنا</span>
+                </button>
+
+                <button class="login-menu-item" type="button" data-login-menu-screen="privacy">
+                    <img class="login-menu-icon" src="https://i.imgur.com/GlsgQA0.png" alt="سياسة الخصوصية">
+                    <span>سياسة الخصوصية</span>
+                </button>
+            </div>
+        </aside>
+
+        <!-- ===================== صفحات القائمة المطلوبة ===================== -->
+        <div id="login-menu-content" class="login-menu-content" aria-hidden="true">
+            <div class="login-menu-content-header">
+                <button type="button" id="close-login-menu-content" aria-label="رجوع">رجوع</button>
+                <div>تسجيل الدخول</div>
+                <span></span>
+            </div>
+            <div class="login-menu-content-body">
+                <img id="login-menu-content-image" src="" alt="" />
+            </div>
+        </div>
+
+        <!-- شاشة عن بال باي -->
+        <div class="full-page-screen" id="aboutUsScreen">
+            <div class="top-bar">
+                <div class="top-title">تسجيل الدخول</div>
+                <div class="menu" id="closeAboutUs"><i class="fas fa-bars"></i></div>
+            </div>
+            <div class="full-page-body">
+                <h2 class="full-page-title">عن بال باي</h2>
+                <p>تأسست شركة PalPay كنتيجة للتعاون المشترك ما بين موظفي بنك فلسطين وشركة PCNC في مجال قبول بطاقات الائتمان، والحصول على التراخيص المطلوبة من فيزا وماستركارد منذ عام 1996. حيث عملت هذه الخبرات للحصول على شهادات دولية، الأمر الذي ساهم في تأسيس شركة PalPay في عام 2010. واستمر العمل في عام 2003 لتقديم التحديثات والتحسينات لقبول بطاقات الائتمان وتجديد التراخيص من قبل فيزا وماستركارد، حيث تم إطلاق قبول البطاقات الذكية في عام 2006 في فلسطين بعد ترخيصها من الشركات الدولية، لوضع فلسطين كأول دولة عربية تنتهي الترخيص وتطلق أنظمة قبول البطاقات الذكية.</p>
+                <p>في عام 2010، تم إدخال نظام الدفع الإلكتروني الأول الذي تم تطويره من قبل الخبرات الفلسطينية في فلسطين من خلال PalPay، الذي يمر من خلاله حالياً حوالي 1.2 مليون حركة شهرياً تمثل حوالي 54 مليون شيقل في الشهر بدون أي اختراقات أو سرقات. ولدى PalPay اليوم أكثر من 60 مزود خدمة مربوط بأنظمتها، وتقدم خدماتها من خلال أكثر من 6000 مركز تسديد معتمد منتشرة في جميع الأراضي الفلسطينية.</p>
+                <p>على مدار سنوات عملها، طورت شركة PalPay العديد من وسائل الدفع والتسديد لخدمة المواطنين غير البنكيين الذين لا يملكون حسابات بنكية ويعيشون في مناطق نائية، وذلك من خلال إنشاء شبكة واسعة من مراكز التسديد المعتمدة لتمكين هؤلاء المواطنين من تسديد جميع التزاماتهم المالية بكل سهولة وأمان. وتعمل شركة PalPay بشكل مكثف للوصول إلى جميع المواطنين في جميع المناطق من خلال شبكة مكونة من أكثر من 6000 مركز تسديد معتمد؛ موزعة في جميع أنحاء البلاد بحيث تغطي جميع المدن والقرى والمناطق الريفية والمخيمات، لتوفير الوقت والجهد على مواطنين وتوفر بديلاً لهم عن الوقوف في طوابير طويلة لدفع مستحقاتهم؛ فما عليهم فقط إلا التوجه إلى أقرب مركز تسديد معتمد للاستعلام عن الفواتير الغير مدفوعة ودفعها، بالإضافة إلى دفع رسوم الجامعات وتسديد أقساط القروض الصغيرة وشحن الهواتف النقالة.</p>
+                <p>كما عملت شركة PalPay أيضا على تطوير أنظمة تخدم المواطنين الذين لديهم حسابات بنكية ويفضلون استخدامها لتسديد التزاماتهم المالية، وذلك من خلال استخدام تطبيق الإنترنت البنكي والموبايل البنكي التابعة للبنوك المتعاقدة مع شركة PalPay الأمر الذي يتيح لهم القيام بجميع المعاملات البنكية، بالإضافة إلى الاستعلام عن فواتيرهم الغير مدفوعة وتسديدها، وشحن هواتفهم النقالة والتمتع بكافة خدمات PalPay، مع ضمان الدفع المباشر للفواتير أو الرسوم؛ حيث يتم تحويل المبلغ المدفوع مباشرةً من حساب المواطن البنكي إلى الحساب البنكي الخاص بمزود الخدمة.</p>
+                <p>لقد نجحت شركة PalPay في العمل مع جميع مزودي الخدمات لتزويدهم بنظام كامل متكامل للسماح لعملائهم بالقيام بما يلي:</p>
+                <ol class="about-us-list numbered">
+                    <li>الاستعلام عن الفواتير الغير مدفوعة.</li>
+                    <li>تسديد مختلف أنواع الفواتير.</li>
+                    <li>شحن أرصدة الهواتف النقالة.</li>
+                    <li>شحن عدادات الكهرباء والمياه مسبقة الدفع.</li>
+                    <li>تسديد أقساط القروض الممنوحة من مؤسسات الإقراض الصغير.</li>
+                    <li>تسديد أقساط طلاب الجامعات والمدارس.</li>
+                    <li>استبدل نقاط الولاء.</li>
+                    <li>الشراء عبر الإنترنت بسهولة حتى إذا لم يكن لديهم حساب بنكي.</li>
+                </ol>
+            </div>
+        </div>
+
+        <!-- شاشة تواصل معنا -->
+        <div class="full-page-screen" id="contactUsScreen">
+            <div class="top-bar">
+                <div class="top-title">تسجيل الدخول</div>
+                <div class="menu" id="closeContactUs"><i class="fas fa-bars"></i></div>
+            </div>
+            <div class="full-page-body">
+                <h2 class="full-page-title"><i class="fas fa-phone-alt contact-title-icon"></i> للمساعدة والاستفسار</h2>
+                <p class="contact-intro">نسعد بخدمتكم والإجابة عن استفساراتكم من خلال القنوات التالية:</p>
+
+                <ul class="contact-list">
+                    <li>
+                        <i class="fas fa-mobile-alt contact-list-icon"></i>
+                        <span class="contact-list-label">الاتصال على:</span>
+                        <a href="tel:1700102010" aria-label="الاتصال على 1700102010">1700102010</a>
+                    </li>
+                    <li>
+                        <i class="fas fa-comment-dots contact-list-icon"></i>
+                        <span class="contact-list-label">مراسلتنا عبر تطبيق واتس آب:</span>
+                        <a href="https://wa.me/970566884400" target="_blank" rel="noopener"
+                           aria-label="مراسلتنا على واتس آب على الرقم +970566884400">970566884400+</a>
+                    </li>
+                </ul>
+
+                <h3 class="contact-subtitle"><i class="fas fa-globe contact-subtitle-icon"></i> تابعونا على مواقع التواصل الاجتماعي:</h3>
+                <nav aria-label="روابط مواقع التواصل" class="social-nav">
+                    <ul class="social-list plain">
+                        <li><a href="https://www.facebook.com/PalPayCompany" target="_blank" rel="noopener"
+                               aria-label="صفحتنا على فيسبوك">Facebook</a></li>
+                        <li><a href="https://www.instagram.com/palpayco/" target="_blank" rel="noopener"
+                               aria-label="حسابنا على إنستغرام">Instagram</a></li>
+                        <li><a href="https://www.linkedin.com/company/palpayco" target="_blank"
+                               rel="noopener" aria-label="صفحتنا على لينكدإن">LinkedIn</a></li>
+                        <li><a href="https://x.com/PalPayCompany" target="_blank" rel="noopener"
+                               aria-label="حسابنا على تويتر إكس">Twitter X</a></li>
+                    </ul>
+                </nav>
+
+                <h3 class="contact-subtitle"><i class="fas fa-building contact-subtitle-icon"></i> العنوان:</h3>
+                <address class="contact-address">
+                    رام الله - البيرة، شارع الإرسال،<br>
+                    مبنى CCC، الطابق الثالث،<br>
+                    صندوق بريد 83
+                </address>
+            </div>
+        </div>
+
+        <!-- شاشة إنشاء USSD QR -->
+        <div class="full-page-screen" id="ussdQrScreen">
+            <header class="main-header">
+                <div class="header-left">
+                    <div class="back-icon-wrap" id="closeUssdQr">
+                        <i class="fas fa-arrow-right back-arrow-icon"></i>
+                    </div>
+                </div>
+            </header>
+            <div class="ussd-body">
+                <h2 class="ussd-title">إنشاء USSD QR</h2>
+
+                <div class="ussd-amount-row">
+                    <div class="ussd-amount-field">
+                        <input type="text" inputmode="decimal" id="ussdAmountInput">
+                        <span class="ussd-label">المبلغ</span>
+                    </div>
+                    <div class="ussd-currency-badge">شيقل</div>
+                </div>
+
+                <button class="ussd-create-btn" id="ussdCreateBtn">إنشاء</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ===================== الشاشة 1 ===================== -->
+    <div id="screen-1" class="app-screen" style="display:none;">
+        <header class="main-header">
+            <div class="header-left">
+                <div class="menu-bars" id="menu-trigger"><span></span><span></span><span></span></div>
+            </div>
+            <div class="header-right">
+                <div class="header-actions">
+                    <img src="https://i.imgur.com/y6oqw6i.png" class="header-custom-icon qr-trigger">
+                    <div class="notification-container" id="open-notifications">
+                        <span class="badge-outline" id="notif-badge">0</span>
+                        <i class="far fa-bell bell-icon"></i>
+                    </div>
+                </div>
+            </div>
+        </header>
+
+        <main class="page-body main-content-s1 main-content">
+            <div class="white-balance-card" id="to-account-details">
+                <div class="welcome-text shifted">مرحباً، Marwa Raed Abed Al-Azez<br>Younis</div>
+                <div class="account-type-label shifted medium-weight">حساب الشيقل</div>
+                <div class="balance-line-container-left">
+                    <span class="amount-number-system">44.91</span>
+                    <span class="currency-label-thin">شيقل</span>
+                </div>
+            </div>
+
+            <div class="info-strip-row compact-strip account-currency-trigger" id="to-dollar-account-details" data-currency="dollar" role="button" tabindex="0">
+                <span class="strip-label sky-blue-thin">حساب الدولار</span>
+                <span class="strip-value">0.00 دولار أمريكي</span>
+            </div>
+            <div class="info-strip-row compact-strip account-currency-trigger" id="to-dinar-account-details" data-currency="dinar" role="button" tabindex="0">
+                <span class="strip-label black-thin">حساب الدينار</span>
+                <span class="strip-value">0.000 دينار أردني</span>
+            </div>
+
+            <div id="toggle-services" class="all-services-title-left">عرض الكل (17)</div>
+            <div id="services-grid" class="services-layout-grid">
+                <div class="service-card"><img src="https://i.imgur.com/D0TBrWi.png"></div>
+                <div class="service-card" id="check-code-trigger"><img src="https://i.imgur.com/2AyY1bb.png"></div>
+                <div class="service-card"><img src="https://i.imgur.com/KUZ3U3P.png"></div>
+                <div class="service-card"><img src="https://i.imgur.com/uFu47Ca.png"></div>
+                <div class="service-card"><img src="https://i.imgur.com/akR2BaC.png"></div>
+                <div class="service-card"><img src="https://i.imgur.com/0rSFcwh.png"></div>
+                <div class="service-card" id="to-s2"><img src="https://i.imgur.com/N8U54KA.png"></div>
+                <div class="service-card" id="to-s7"><img src="https://i.imgur.com/wL8yApL.png"></div>
+                <div class="service-card"><img src="https://i.imgur.com/25NHiLB.png"></div>
+                <div class="service-card"><img src="https://i.imgur.com/Q9YYfAQ.png"></div>
+                <div class="service-card"><img src="https://i.imgur.com/Pq4XHK7.png"></div>
+                <div class="service-card"><img src="https://i.imgur.com/ubpbqLa.png"></div>
+                <div class="service-card"><img src="https://i.imgur.com/zhISrIX.png"></div>
+                <div class="service-card"><img src="https://i.imgur.com/88qkrOi.png"></div>
+                <div class="service-card"><img src="https://i.imgur.com/3R4f4xF.png"></div>
+                <div class="service-card"><img src="https://i.imgur.com/3ag3hOW.png"></div>
+                <div class="service-card"><img src="https://i.imgur.com/0YTDwuy.png"></div>
+            </div>
+        </main>
+    </div>
+
+    <!-- ===================== شاشة تفاصيل الحساب ===================== -->
+    <div id="screen-account-details" class="app-screen acc-details-screen" style="display:none;">
+        <header class="main-header">
+            <div class="header-left">
+                <div class="menu-bars" id="back-from-account-details">
+                    <i class="fas fa-arrow-right back-arrow-icon"></i>
+                </div>
+            </div>
+        </header>
+
+        <div class="acc-content main-content">
+            <div class="acc-top-fixed-part">
+                <h1 class="acc-main-title">تفاصيل الحساب</h1>
+                <div class="acc-section-container">
+                    <h2 class="acc-section-title" id="acc-currency-title">حساب الشيقل</h2>
+                    <table class="acc-account-details-table">
+                        <tr>
+                            <td class="acc-label-td">رقم الحساب الكامل</td>
+                            <td class="acc-colon-td">:</td>
+                            <td class="acc-num-td" id="acc-full-number">090001562717376004000</td>
+                        </tr>
+                        <tr>
+                            <td class="acc-label-td">الرصيد المتوفر</td>
+                            <td class="acc-colon-td">:</td>
+                            <td class="acc-num-td acc-balance-text" id="acc-available-balance">44.91</td>
+                        </tr>
+                        <tr>
+                            <td class="acc-label-td acc-sky-blue-text">الرصيد الحالي</td>
+                            <td class="acc-colon-td">:</td>
+                            <td class="acc-num-td acc-balance-text" id="acc-current-balance">44.91</td>
+                        </tr>
+                    </table>
+                </div>
+                <div class="acc-divider"></div>
+                <div class="acc-section-container">
+                    <h2 class="acc-section-title" style="margin-bottom: 0;">كشف حساب مختصر</h2>
+                </div>
+            </div>
+
+            <div class="acc-table-container">
+                <table class="acc-statement-table">
+                    <thead>
+                        <tr>
+                            <th class="acc-col-date">تاريخ الحركة</th>
+                            <th class="acc-col-desc acc-sky-blue-text">الوصف</th>
+                            <th class="acc-col-amount acc-sky-blue-text">المبلغ</th>
+                        </tr>
+                    </thead>
+                    <tbody id="statement-tbody">
+                                                <tr data-currency="shekel">
+                            <td class="acc-col-date">04/06/2026</td>
+                            <td class="acc-col-desc"><span>دفع ل محمد سمير علي ابوعلبة ، رقم الحركة : 324535226</span></td>
+                            <td class="acc-col-amount">5.5-</td>
+                        </tr>
+                        <tr data-currency="shekel">
+                            <td class="acc-col-date">04/06/2026</td>
+                            <td class="acc-col-desc"><span>دفع ل باندا مول، رقم الحركة :3746879، Q097591352</span></td>
+                            <td class="acc-col-amount">12.0-</td>
+                        </tr>
+                        <tr data-currency="shekel">
+                            <td class="acc-col-date">04/06/2026</td>
+                            <td class="acc-col-desc"><span>دفع ل محمد سمير علي ابوعلبة ، رقم الحركة : 206125868</span></td>
+                            <td class="acc-col-amount">20.0-</td>
+                        </tr>
+                        <tr data-currency="shekel">
+                            <td class="acc-col-date">31/03/2026</td>
+                            <td class="acc-col-desc"><span class="acc-en-text">Transfer to<br>account Shiekel<br>08DE8F0A<br>0341030B/<br>Marwa Al-Azez/<br>MOHAMMED<br>EDWAN/CT/09D</span></td>
+                            <td class="acc-col-amount">70.0-</td>
+                        </tr>
+                        <tr data-currency="shekel">
+                            <td class="acc-col-date">30/03/2026</td>
+                            <td class="acc-col-desc"><span class="acc-en-text">ATM Withdrawal<br>Gaza Branch</span></td>
+                            <td class="acc-col-amount">100.0-</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- ===================== الشاشة 2 ===================== -->
+    <div id="screen-2" class="payment-view" style="display:none;">
+        <header class="main-header">
+            <div class="header-left">
+                <div class="menu-bars" id="back-to-s1">
+                    <i class="fas fa-arrow-right back-arrow-icon"></i>
+                </div>
+            </div>
+        </header>
+        <div class="main-content">
+            <div class="container">
+                <h1 class="main-title">الدفع لصديق</h1>
+                <div class="payment-card" id="to-s3">
+                    <img src="https://i.imgur.com/jr0pNcr.png" alt="Payment Icon" class="payment-img">
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ===================== الشاشة 3 ===================== -->
+    <div id="screen-3" class="friends-view" style="display:none;">
+        <header class="main-header">
+            <div class="header-left">
+                <div class="menu-bars" id="back-to-s2">
+                    <i class="fas fa-arrow-right back-arrow-icon"></i>
+                </div>
+            </div>
+        </header>
+        <div class="main-content">
+            <div class="app-wrapper">
+                <h1 class="page-main-title adjusted-title">الأصدقاء</h1>
+                <div class="search-container">
+                    <input type="text" placeholder="بحث" class="search-field">
+                </div>
+                <section class="section">
+                    <h2 class="sub-title thin-title">اخر جهات الاتصال</h2>
+                    <div class="horizontal-scroll no-scrollbar">
+                        <div class="contact-card">
+                            <div class="logo-wrapper hani-logo">
+                                <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQsBGlRu3lHxzkgUR-nnflMv6GdZCm3UooakEJDQAXXAnIy2cNjCbc6h1Qo&s=10" class="card-logo">
+                            </div>
+                            <div class="card-text">
+                                <span class="name-medium main-name">هاني محمد جادالله</span>
+                                <span class="name-medium sub-name">ابو الحصين</span>
+                                <span class="phone-dark-gray">0595056531</span>
+                            </div>
+                        </div>
+                        <div class="contact-card">
+                            <div class="logo-wrapper rajab-logo-xl">
+                                <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRo-2NOar_qcerlGh166EDRRqtax-y9FOS0Kc3sIEkBk078sxawPAvRbAV7&s=10" class="card-logo">
+                            </div>
+                            <div class="card-text">
+                                <span class="name-medium">رجب احمد مصطفى ابر</span>
+                                <span class="phone-dark-gray">598877715</span>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+                <section class="section">
+                    <h2 class="sub-title thin-title">من جهات الاتصال</h2>
+                    <div class="vertical-list">
+                        <div class="list-item">
+                            <div class="avatar-circle">م م</div>
+                            <div class="contact-info">
+                                <p class="name-dark-gray">محمد وائل محمد مصلح</p>
+                                <p class="phone-dark-gray-large">0597586061</p>
+                            </div>
+                        </div>
+                        <div class="list-item">
+                            <div class="avatar-circle">ع ع</div>
+                            <div class="contact-info">
+                                <p class="name-dark-gray">عبدالكريم عاشور ضهير</p>
+                                <p class="phone-dark-gray-large">0592852929</p>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+                <div class="fab-btn-bright-purple">+</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ===================== الشاشة 4 ===================== -->
+    <div id="screen-4" class="app-screen" style="display:none;">
+        <header class="main-header">
+            <div class="header-left">
+                <div class="menu-bars" id="back-to-s3">
+                    <i class="fas fa-arrow-right back-arrow-icon"></i>
+                </div>
+            </div>
+        </header>
+        <div class="main-content">
+            <main class="content">
+                <h1 class="main-title">صديقك من جهات الاتصال</h1>
+                <div class="form-group">
+                    <input type="text" id="s4-phone-input" placeholder="رقم الموبايل" class="input-field" inputmode="numeric" maxlength="10" autocomplete="off">
+                    <div id="s4-name-display" style="min-height:26px;padding:5px 8px 0;font-size:14px;font-weight:700;text-align:right;direction:rtl;"></div>
+                </div>
+                <div class="form-group row">
+                    <input type="text" placeholder="المبلغ" class="input-field amount-input">
+                    <div class="currency-badge">شيكل</div>
+                </div>
+                <div class="form-group">
+                    <input type="text" placeholder="الوصف" class="input-field description-input">
+                </div>
+                <button class="pay-button" id="openSheetBtn">ادفع</button>
+            </main>
+        </div>
+
+        <div class="overlay" id="overlay"></div>
+        <div class="bottom-sheet" id="bottomSheet">
+            <div class="sheet-header no-border">
+                <span class="close-text" id="closeSheetBtn">أغلق</span>
+            </div>
+            <div class="sheet-body">
+                <div class="bank-item" data-target="palestine">
+                    <div class="bank-right-side">
+                        <img src="https://i.imgur.com/gGxRiQb.jpeg" class="bank-logo-xl" alt="Logo">
+                        <span class="bank-name">البنك الاسلامي العربي</span>
+                    </div>
+                </div>
+                <div class="bank-item" data-target="palpay">
+                    <div class="bank-right-side">
+                        <img src="https://i.imgur.com/gGxRiQb.jpeg" class="bank-logo-xl" alt="Logo">
+                        <span class="bank-name">بنك فلسطين</span>
+                    </div>
+                </div>
+                <div class="bank-item no-bottom-border" data-target="palpay-wallet">
+                    <div class="bank-right-side">
+                        <img src="https://i.imgur.com/gGxRiQb.jpeg" class="bank-logo-xl" alt="Logo">
+                        <span class="bank-name">محفظة بال باي</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ===================== الشاشة 5 ===================== -->
+    <div id="screen-5" class="app-screen" style="display:none;">
+        <header class="main-header">
+            <div class="header-left">
+                <div class="menu-bars" id="back-to-s4">
+                    <i class="fas fa-arrow-right back-arrow-icon"></i>
+                </div>
+            </div>
+        </header>
+        <div class="main-content">
+            <div class="app-container">
+                <h1 class="main-title">تأكيد</h1>
+                <div class="transaction-details">
+                    <div class="row">
+                        <span class="label">من حساب</span>
+                        <span class="value">حساب الشيقل</span>
+                    </div>
+                    <div class="row">
+                        <span class="label">إلى</span>
+                        <div class="recipient-info">
+                            <div class="palpay-icon" id="recipientIcon"></div>
+                            <div class="text-group">
+                                <span class="name" id="recipientName">طلعت محمد موسى الفقيعاوي</span>
+                                <span class="phone" id="recipientPhone">0599267682</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row mt-separator">
+                        <span class="label">المبلغ</span>
+                        <span class="value" id="amount-s5">ILS 0</span>
+                    </div>
+                    <div class="row">
+                        <span class="label">العمولة</span>
+                        <span class="value" id="commission-s5">ILS 0.0</span>
+                    </div>
+                    <div class="row">
+                        <span class="label">المبلغ الكلي</span>
+                        <span class="value" id="total-s5">ILS 0.0</span>
+                    </div>
+                </div>
+                <p class="hint-msg">الخطوة التالية لا تتطلب رقم مرور</p>
+                <button id="confirmBtn" class="btn-confirm">تأكيد</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ===================== الشاشة 6 ===================== -->
+    <div id="screen-6" class="app-screen" style="display:none;">
+        <header class="main-header">
+            <div class="header-left"></div>
+            <div class="header-right"></div>
+        </header>
+        <div class="main-content">
+            <main class="content-wrapper">
+                <div class="image-section">
+                    <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRGA_XymEMryIOGQdgMkfBGCWU0vbhC82sl_Q&usqp=CAU" alt="صورة إشعار دفع">
+                </div>
+                <div class="success-message">تمت عملية التحويل بنجاح.</div>
+                <div class="data-box">
+                    <div class="receiver-info">
+                        <p class="name" id="display-name">mai kamel amro amro</p>
+                        <p class="phone" id="display-phone">0598267442</p>
+                    </div>
+                    <div class="transaction-details">
+                        <div class="amount-row">
+                            <p class="label">المبلغ</p>
+                            <p class="value" id="display-amount">1.0</p>
+                        </div>
+                        <div class="transaction-row">
+                            <p class="label">رمز العملية</p>
+                            <p class="value" id="display-code">4255</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="confirm-button-container">
+                    <button class="confirm-button" id="finish-button">موافق</button>
+                </div>
+            </main>
+        </div>
+    </div>
+
+    <!-- ===================== شاشة الإشعارات ===================== -->
+    <div id="screen-notifications" class="app-screen notif-screen" style="display:none;">
+        <header class="main-header">
+            <div class="header-left">
+                <div class="menu-bars" id="back-from-notifications">
+                    <i class="fas fa-arrow-right back-arrow-icon"></i>
+                </div>
+            </div>
+        </header>
+        <div class="main-content notif-content">
+            <div class="notif-top-fixed-part">
+                <h2 class="acc-section-title notif-title-custom">الإشعارات</h2>
+            </div>
+            <main id="notifications-list" class="notif-list-container"></main>
+        </div>
+    </div>
+
+    <!-- ===================== الشاشة 7 ===================== -->
+    <div id="screen-7" class="payment-view" style="display:none;">
+        <header class="main-header">
+            <div class="header-left">
+                <div class="menu-bars" id="back-to-s1-from-s7">
+                    <i class="fas fa-arrow-right back-arrow-icon"></i>
+                </div>
+            </div>
+        </header>
+        <div class="main-content">
+            <div class="container">
+                <h1 class="main-title">الدفع لتاجر</h1>
+                <div class="horizontal-payments-container">
+                    <div class="payment-card">
+                        <img src="https://i.imgur.com/J3zaJSU.png" alt="Service 1" class="payment-img">
+                    </div>
+                    <div class="payment-card" id="open-scanner-btn">
+                        <img src="https://i.imgur.com/hyGtEXb.png" class="payment-img">
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ===================== الشاشة 8 ===================== -->
+    <div id="screen-8" class="app-screen" style="display:none;">
+        <header class="main-header">
+            <div class="header-left">
+                <div class="menu-bars" id="back-to-s7-from-s8">
+                    <i class="fas fa-arrow-right back-arrow-icon"></i>
+                </div>
+            </div>
+        </header>
+        <div class="main-content">
+            <h2 class="s8-title">تاجر من جهات الاتصال-جديد</h2>
+            <div class="s8-input-row">
+                <div class="s8-input-wrapper">
+                    <input type="text" id="merchant-phone-input" placeholder="رقم الموبايل" dir="rtl" inputmode="numeric" maxlength="10" pattern="(059|056)[0-9]{7}">
+                </div>
+                <div class="s8-icon-group">
+                    <div class="s8-icon-btn">
+                        <img src="https://i.imgur.com/uinLCTv.png" alt="User" class="icon-user">
+                    </div>
+                    <div class="s8-icon-btn">
+                        <img src="https://i.imgur.com/y6oqw6i.png" alt="PalPay" class="icon-qr qr-trigger">
+                    </div>
+                </div>
+            </div>
+            <button id="btn-pay-s8" class="btn-pay-s8">ادفع</button>
+        </div>
+    </div>
+
+    <!-- ===================== الشاشة 9 ===================== -->
+    <div id="screen-9" class="app-screen" style="display:none;">
+        <header class="main-header">
+            <div class="header-left">
+                <div class="menu-bars" id="back-to-s8">
+                    <i class="fas fa-arrow-right back-arrow-icon"></i>
+                </div>
+            </div>
+        </header>
+        <div class="main-content">
+            <div class="s9-content">
+                <h2 class="s9-title">تاجر من جهات الاتصال-جديد</h2>
+                <div class="s9-field">
+                    <input type="text" id="merchant-phone-s9" value="" readonly>
+                </div>
+                <div class="s9-field">
+                    <input type="text" id="merchant-name-s9" value="" readonly>
+                </div>
+                <div class="s9-amount-row">
+                    <input type="text" id="amount-s9" placeholder="المبلغ">
+                    <div class="s9-currency-badge">شيقل</div>
+                </div>
+                <div class="s9-desc-field">
+                    <input type="text" placeholder="الوصف">
+                </div>
+                <button id="next-to-confirm-merchant" class="s9-btn">التالي</button>
+                <button id="cancel-merchant-s9" class="s9-btn">إلغاء</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ===================== مودال تأكيد التاجر ===================== -->
+    <div id="merchant-confirm-modal">
+        <div class="merchant-modal-box">
+            <div class="merchant-modal-body">
+                <p>
+                    هل انت متاكد من دفع مبلغ
+                    <span id="modal-amount-text" class="modal-highlight">0 شيكل</span>
+                    الى
+                    <span id="modal-merchant-text" class="modal-highlight">اسم التاجر</span>؟
+                    <span class="modal-rate">إلى المبلغ : <span id="modal-total-text">0.0 ILS</span></span>
+                    <span class="modal-rate">سعر تحويل العملة : <span>1.0</span></span>
+                </p>
+            </div>
+            <div class="merchant-modal-footer">
+                <button id="confirm-merchant-btn" class="btn-merchant-confirm">موافق</button>
+                <button id="cancel-merchant-btn" class="btn-merchant-cancel">إلغاء</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ===================== الشاشة 10 ===================== -->
+    <div id="screen-10" style="display: none;">
+        <div class="success-header">
+            <div class="header-actions">
+                <div class="menu-bars" id="back-from-s10">
+                    <i class="fas fa-arrow-right back-arrow-icon"></i>
+                </div>
+            </div>
+            <div class="notification-container"></div>
+        </div>
+
+        <div class="success-title">تم الدفع بنجاح</div>
+        <div class="icon-box">
+            <img src="https://i.imgur.com/rTIbk2v_d.webp" alt="success" id="s10-image">
+        </div>
+
+        <div class="content-body">
+            <div class="data-row">
+                <div class="label-text">اسم التاجر</div>
+                <div class="value-text">سعود بديع فايق ساق الله</div>
+            </div>
+            <div class="data-row">
+                <div class="label-text">إسم نقطة البيع</div>
+                <div class="value-text">سعود بديع فايق ساق الله</div>
+            </div>
+            <div class="data-row">
+                <div class="label-text">المبلغ</div>
+                <div class="value-text">30.0</div>
+            </div>
+            <div class="data-row">
+                <div class="label-text">نوع التحويل</div>
+                <div class="value-text">الدفع لتاجر</div>
+            </div>
+            <div class="data-row">
+                <div class="label-text">الرقم المرجعي</div>
+                <div class="value-text" id="s10-ref">LZ81412764</div>
+            </div>
+            <div class="data-row">
+                <div class="label-text">تاريخ الحركة</div>
+                <div class="value-text" id="s10-date">2026-03-29</div>
+            </div>
+        </div>
+
+        <div class="footer-section">
+            <button class="btn-done" id="finish-merchant-payment">تم</button>
+        </div>
+    </div>
+
+    <!-- ===================== الألواح الجانبية المخفية ===================== -->
+    <div id="hidden-right" class="hidden-panel-custom right-side">
+        <div class="panel-header">إعدادات الحساب</div>
+        <div class="field-box"><label>الاسم المستعار</label><input type="text" id="edit-name"></div>
+        <div class="field-box"><label>الرصيد الرئيسي</label><input type="text" id="edit-balance"></div>
+        <button id="save-right" class="panel-btn">حفظ التعديلات</button>
+    </div>
+
+    <div id="hidden-left" class="hidden-panel-custom left-side">
+        <div class="panel-header">إعدادات التاجر والمستلم</div>
+        <div class="field-box"><label>اسم المستلم</label><input type="text" id="recipient-name-input"></div>
+        <div class="field-box"><label>رقم المستلم</label><input type="text" id="recipient-phone-input" inputmode="numeric" maxlength="10" pattern="(059|056)[0-9]{7}"></div>
+        <hr class="panel-divider">
+        <div class="field-box"><label>اسم التاجر الجديد</label><input type="text" id="merchant-name-input"></div>
+        <div class="field-box"><label>رقم موبايل التاجر</label><input type="text" id="merchant-phone-input-edit"></div>
+        <hr class="panel-divider">
+        <div class="panel-header" style="font-size:12px;opacity:0.7;">ربط الحساب الحقيقي (اختياري)</div>
+        <div class="field-box"><label>رقم حساب PalPay</label><input type="text" id="palpay-auth-phone-input" inputmode="numeric" maxlength="10" autocomplete="off" placeholder="059XXXXXXX"></div>
+        <div class="field-box"><label>كلمة المرور</label><input type="password" id="palpay-auth-password-input" autocomplete="new-password" placeholder="••••••••"></div>
+        <div id="auto-save-timer-text" class="timer-msg">سيتم الحفظ تلقائياً خلال 20 ثانية...</div>
+        <button id="save-left" class="panel-btn">حفظ الآن</button>
+    </div>
+
+    <!-- ===================== نافذة التحقق ===================== -->
+    <div id="verifyModal" class="verify-modal">
+        <div class="verify-box">
+            <p class="verify-text">فشل في التحقق من حساب الصديق<br>السبب: لا يوجد رقم حساب صديق لرقم<br>الموبايل المطلوب</p>
+            <button id="verifyOkBtn" class="verify-btn">موافق</button>
+        </div>
+    </div>
+
+    <!-- ===================== ماسح QR ===================== -->
+    <div id="reader-container">
+        <div id="top-controls-wrapper">
+            <i id="flash-toggle-btn" class="fas fa-bolt" title="فلاش"></i>
+            <span id="close-scanner-text">أغلق</span>
+        </div>
+        <div id="reader"></div>
+        <div class="scanner-bottom-bar">
+            <button id="scan-image-btn">اختر صورة</button>
+        </div>
+        <input type="file" id="qr-input-file" accept="image/*">
+    </div>
+
+    <!-- ===================== شاشة فحص كود الصرف ===================== -->
+    <div id="check-code-screen" class="full-page-screen receipt-check-screen">
+        <div class="receipt-check-phone">
+            <header class="receipt-check-header">
+                <button type="button" class="receipt-check-back" id="close-check-code" aria-label="رجوع"><i class="fas fa-arrow-right back-arrow-icon"></i></button>
+                <div class="receipt-check-header-spacer"></div>
+            </header>
+            <main class="receipt-check-main">
+                <h1 class="receipt-check-title">فحص كود الصرف</h1>
+                <section class="receipt-check-section">
+                    <h2 class="receipt-check-section-heading">معلومات المستفيد</h2>
+                    <div class="receipt-check-info">
+                        <div class="receipt-check-info-row"><span>الاسم</span><span></span></div>
+                        <div class="receipt-check-info-row"><span>رقم الهوية</span><span></span></div>
+                    </div>
+                    <h2 class="receipt-check-code-heading">كود الصرف</h2>
+                    <div class="receipt-check-table-head">
+                        <div>رقم الموبايل</div><div>اسم المستفيد</div><div>المبلغ</div>
+                    </div>
+                    <div class="receipt-check-empty"><p>لم يتم العثور على نتائج</p></div>
+                </section>
+            </main>
+        </div>
+    </div>
+
+    <!-- ===================== القائمة الجانبية الرئيسية ===================== -->
+    <div id="main-menu" class="main-menu-panel">
+        <div class="menu-items-container">
+            <!-- القسم الأول: الصفحة الرئيسية -->
+            <div class="menu-item" data-action="home">
+                <img src="https://i.imgur.com/pXmTHur.png" alt="الرئيسية" class="menu-icon">
+                <span class="menu-label">الرئيسية</span>
+            </div>
+            
+            <!-- القسم الثاني: الأدوات والخدمات -->
+            <div class="menu-item" data-action="check-code">
+                <img src="https://i.imgur.com/EIW3stX.png" alt="فحص كود الصرف" class="menu-icon">
+                <span class="menu-label">فحص كود الصرف</span>
+            </div>
+            <div class="menu-item">
+                <img src="https://i.imgur.com/TCFW1Ts.png" alt="بطاقتي فيزا" class="menu-icon">
+                <span class="menu-label">بطاقتي فيزا</span>
+            </div>
+            <div class="menu-item">
+                <img src="https://i.imgur.com/xSS5uWt.png" alt="التحويلات" class="menu-icon">
+                <span class="menu-label">التحويلات</span>
+            </div>
+            
+            <!-- القسم الثالث: عمليات الدفع والتحويلات -->
+            <div class="menu-item">
+                <img src="https://i.imgur.com/ogSD7fp.png" alt="الدفعات و المشتريات" class="menu-icon">
+                <span class="menu-label">الدفعات و المشتريات</span>
+            </div>
+            <div class="menu-item" data-action="loan">
+                <img src="https://i.imgur.com/ogSD7fp.png" alt="طلب قرض" class="menu-icon">
+                <span class="menu-label">طلب قرض</span>
+            </div>
+            <div class="menu-item" data-action="pay-friend">
+                <img src="https://i.imgur.com/mGDOa1x.png" alt="الدفع لصديق" class="menu-icon">
+                <span class="menu-label">الدفع لصديق</span>
+            </div>
+            <div class="menu-item" data-action="pay-merchant">
+                <img src="https://i.imgur.com/o91iXAK.png" alt="الدفع لتاجر" class="menu-icon">
+                <span class="menu-label">الدفع لتاجر</span>
+            </div>
+            
+            <!-- القسم الرابع: عمليات السحب والشحن -->
+            <div class="menu-item">
+                <img src="https://i.imgur.com/wg9x2Uo.png" alt="سحب نقدي" class="menu-icon">
+                <span class="menu-label">سحب نقدي</span>
+            </div>
+            <div class="menu-item">
+                <img src="https://i.imgur.com/qundDEx.png" alt="اتمام شحن محفظتي" class="menu-icon">
+                <span class="menu-label">اتمام شحن محفظتي</span>
+            </div>
+            
+            <!-- القسم الخامس: الأدوات الإضافية -->
+            <div class="menu-item" data-action="qr-scan">
+                <img src="https://i.imgur.com/LtCV2DF.png" alt="قراءة كيواركود" class="menu-icon">
+                <span class="menu-label">قراءة كيواركود</span>
+            </div>
+            
+            <!-- القسم السادس: الإعدادات والحساب -->
+            <div class="menu-item">
+                <img src="https://i.imgur.com/nh43jBx.png" alt="حسابات عائلتي" class="menu-icon">
+                <span class="menu-label">حسابات عائلتي</span>
+            </div>
+            <div class="menu-item">
+                <img src="https://i.imgur.com/lpn7UW6.png" alt="إعدادات" class="menu-icon">
+                <span class="menu-label">إعدادات</span>
+            </div>
+            
+            <!-- القسم السابع: القوانين والخروج -->
+            <div class="menu-item">
+                <img src="https://i.imgur.com/4aw9BDP.png" alt="احكام استخدام محفظتي" class="menu-icon">
+                <span class="menu-label">احكام استخدام محفظتي</span>
+            </div>
+            <div class="menu-item logout-item">
+                <img src="https://i.imgur.com/zoYQEFc.png" alt="خروج" class="menu-icon">
+                <span class="menu-label">خروج</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- ===================== لوادر الشاشة 1 ===================== -->
+    <div id="s1-loader-overlay">
+        <div class="custom-loader"></div>
+    </div>
+
+    <script src="script.js"></script>
+</div>
+</body>
+</html>
